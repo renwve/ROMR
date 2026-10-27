@@ -7,7 +7,9 @@ export default function RootLayout() {
     BeVietnamProRegular: require('../../assets/fonts/BeVietnamPro-Regular.ttf'),
     BeVietnamProSemiBold: require('../../assets/fonts/BeVietnamPro-SemiBold.ttf'),
     BeVietnamProItalics: require('../../assets/fonts/BeVietnamPro-Italic.ttf'),
-    BeVietnamProSemiBoldItalics: require('../../assets/fonts/BeVietnamPro-SemiBoldItalic.ttf')
+    BeVietnamProSemiBoldItalics: require('../../assets/fonts/BeVietnamPro-SemiBoldItalic.ttf'),
+    BeVietnamProBold: require('../../assets/fonts/BeVietnamPro-Bold.ttf'),
+    BeVietnamProBoldItalics: require('../../assets/fonts/BeVietnamPro-BoldItalic.ttf')
   });
 
   if (!fontsLoaded) {
