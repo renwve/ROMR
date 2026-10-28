@@ -1,5 +1,6 @@
-
-import React, { useEffect, useRef, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -13,77 +14,72 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSaved } from "../context/SavedContext";
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 const COLLAPSED_HEIGHT = 170;
 const EXPANDED_HEIGHT = Math.min(SCREEN_HEIGHT * 0.7, 590);
 
 const COLORS = {
-  cream: '#FCF7DF',
-  blue: '#C7D3DB',
-  taupe: '#A79A8A',
-  chocolate: '#3E3630',
-  white: '#FFFFFF',
-  black: '#000000',
-  background: '#E7E7F1',
+  cream: "#FCF7DF",
+  blue: "#C7D3DB",
+  taupe: "#A79A8A",
+  chocolate: "#3E3630",
+  white: "#FFFFFF",
+  black: "#000000",
+  background: "#E7E7F1",
 };
 
 const FONTS = {
-  regular: 'BeVietnamProRegular',
-  semibold: 'BeVietnamProSemiBold',
-  italics: 'BeVietnamProItalics',
-  semiboldItalics: 'BeVietnamProSemiBoldItalics',
+  regular: "BeVietnamProRegular",
+  semibold: "BeVietnamProSemiBold",
+  italics: "BeVietnamProItalics",
+  semiboldItalics: "BeVietnamProSemiBoldItalics",
 };
 
 const destinations = [
   {
-    name: 'Oia, Greece',
-    subtitle: 'Daily Recs',
-    country: 'Greece',
+    name: "Oia, Greece",
+    subtitle: "Daily Recs",
+    country: "Greece",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    weather: 'Sunny',
-    temperature: '20°C',
-    description:
-      'Whitewashed buildings, blue seas and slow afternoons.',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    weather: "Sunny",
+    temperature: "20°C",
+    description: "Whitewashed buildings, blue seas and slow afternoons.",
   },
   {
-    name: 'Kyoto, Japan',
-    subtitle: 'Culture & Calm',
-    country: 'Japan',
+    name: "Kyoto, Japan",
+    subtitle: "Culture & Calm",
+    country: "Japan",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    weather: 'Cloudy',
-    temperature: '18°C',
-    description:
-      'Quiet temples, charming streets and little cafés.',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    weather: "Cloudy",
+    temperature: "18°C",
+    description: "Quiet temples, charming streets and little cafés.",
   },
   {
-    name: 'Amalfi, Italy',
-    subtitle: 'Coastal Escapes',
-    country: 'Italy',
+    name: "Amalfi, Italy",
+    subtitle: "Coastal Escapes",
+    country: "Italy",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    weather: 'Sunny',
-    temperature: '24°C',
-    description:
-      'Colourful seaside villages and long lunches.',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    weather: "Sunny",
+    temperature: "24°C",
+    description: "Colourful seaside villages and long lunches.",
   },
   {
-    name: 'Bali, Indonesia',
-    subtitle: 'Island Living',
-    country: 'Indonesia',
+    name: "Bali, Indonesia",
+    subtitle: "Island Living",
+    country: "Indonesia",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    weather: 'Partly sunny',
-    temperature: '29°C',
-    description:
-      'Tropical greenery, ocean views and peaceful stays.',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    weather: "Partly sunny",
+    temperature: "29°C",
+    description: "Tropical greenery, ocean views and peaceful stays.",
   },
 ];
 
@@ -98,91 +94,91 @@ type TravelCardData = {
 
 const thingsToDo: TravelCardData[] = [
   {
-    id: 'tokyo',
-    title: 'Tokyo Tower, Japan',
+    id: "tokyo",
+    title: "Tokyo Tower, Japan",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    price: 'From $2,300',
-    rating: '4.7',
-    tag: 'Popular',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    price: "From $2,300",
+    rating: "4.7",
+    tag: "Popular",
   },
   {
-    id: 'resort',
-    title: 'Some Resort',
+    id: "resort",
+    title: "Some Resort",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    price: 'From $115',
-    rating: '4.6',
-    tag: '',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    price: "From $115",
+    rating: "4.6",
+    tag: "",
   },
   {
-    id: 'sky',
-    title: 'Sky Diving',
+    id: "sky",
+    title: "Sky Diving",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    price: 'Free walk',
-    rating: '4.8',
-    tag: '',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    price: "Free walk",
+    rating: "4.8",
+    tag: "",
   },
 ];
 
 const communityTrips: TravelCardData[] = [
   {
-    id: 'midlife',
-    title: 'Mid-life Japan Trip',
+    id: "midlife",
+    title: "Mid-life Japan Trip",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    price: 'From $2,300',
-    rating: '4.8',
-    tag: 'Popular',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    price: "From $2,300",
+    rating: "4.8",
+    tag: "Popular",
   },
   {
-    id: 'work',
-    title: 'Forgetting about work',
+    id: "work",
+    title: "Forgetting about work",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    price: 'Free',
-    rating: '5.0',
-    tag: '',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    price: "Free",
+    rating: "5.0",
+    tag: "",
   },
   {
-    id: 'aurora',
-    title: 'Aurora Hunting',
+    id: "aurora",
+    title: "Aurora Hunting",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    price: 'From $450',
-    rating: '4.9',
-    tag: '',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    price: "From $450",
+    rating: "4.9",
+    tag: "",
   },
 ];
 
 const bestOffers: TravelCardData[] = [
   {
-    id: 'beach',
-    title: 'A little beach escape',
+    id: "beach",
+    title: "A little beach escape",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    price: 'From $299',
-    rating: '4.9',
-    tag: 'Limited',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    price: "From $299",
+    rating: "4.9",
+    tag: "Limited",
   },
   {
-    id: 'mountain',
-    title: 'Mountain hideaway',
+    id: "mountain",
+    title: "Mountain hideaway",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    price: 'From $180',
-    rating: '4.8',
-    tag: '',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    price: "From $180",
+    rating: "4.8",
+    tag: "",
   },
   {
-    id: 'island',
-    title: 'Island weekend',
+    id: "island",
+    title: "Island weekend",
     image:
-      'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    price: 'From $350',
-    rating: '4.7',
-    tag: '',
+      "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+    price: "From $350",
+    rating: "4.7",
+    tag: "",
   },
 ];
 
@@ -190,15 +186,13 @@ export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
   const carouselRef = useRef<ScrollView>(null);
 
-  const heroHeight = useRef(
-    new Animated.Value(COLLAPSED_HEIGHT),
-  ).current;
+  const heroHeight = useRef(new Animated.Value(COLLAPSED_HEIGHT)).current;
 
   const expandedOpacity = useRef(new Animated.Value(0)).current;
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  const [savedItems, setSavedItems] = useState<string[]>([]);
+  const { savedItems, toggleSaved } = useSaved();
 
   const activeDestination = destinations[activeIndex];
 
@@ -209,9 +203,7 @@ export default function ExploreScreen() {
 
     Animated.parallel([
       Animated.spring(heroHeight, {
-        toValue: nextExpanded
-          ? EXPANDED_HEIGHT
-          : COLLAPSED_HEIGHT,
+        toValue: nextExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT,
         useNativeDriver: false,
         damping: 22,
         stiffness: 100,
@@ -226,8 +218,7 @@ export default function ExploreScreen() {
   };
 
   const goToSlide = (index: number) => {
-    const nextIndex =
-      (index + destinations.length) % destinations.length;
+    const nextIndex = (index + destinations.length) % destinations.length;
 
     setActiveIndex(nextIndex);
 
@@ -239,8 +230,7 @@ export default function ExploreScreen() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const nextIndex =
-        (activeIndex + 1) % destinations.length;
+      const nextIndex = (activeIndex + 1) % destinations.length;
 
       setActiveIndex(nextIndex);
 
@@ -259,37 +249,20 @@ export default function ExploreScreen() {
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / SCREEN_WIDTH);
 
-    if (
-      index >= 0 &&
-      index < destinations.length &&
-      index !== activeIndex
-    ) {
+    if (index >= 0 && index < destinations.length && index !== activeIndex) {
       setActiveIndex(index);
     }
   };
 
-  const toggleSaved = (id: string) => {
-    setSavedItems((previous) =>
-      previous.includes(id)
-        ? previous.filter((item) => item !== id)
-        : [...previous, id],
-    );
-  };
-
   const openTrip = () => {
-    router.push('/planner');
+    router.push("/planner");
   };
 
   const renderTravelCard = (item: TravelCardData) => {
     const isSaved = savedItems.includes(item.id);
 
     return (
-      <Pressable
-        key={item.id}
-        style={styles.travelCard}
-        onPress={() => {
-        }}
-      >
+      <Pressable key={item.id} style={styles.travelCard} onPress={() => {}}>
         <View style={styles.cardImageContainer}>
           <Image
             source={{ uri: item.image }}
@@ -299,23 +272,21 @@ export default function ExploreScreen() {
 
           {item.tag ? (
             <View style={styles.popularTag}>
-              <Text style={styles.popularTagText}>
-                {item.tag}
-              </Text>
+              <Text style={styles.popularTagText}>{item.tag}</Text>
             </View>
           ) : null}
 
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={
-              isSaved ? 'Remove from saved' : 'Save destination'
+              isSaved ? "Remove from saved" : "Save destination"
             }
             hitSlop={8}
             style={styles.cardHeart}
             onPress={() => toggleSaved(item.id)}
           >
             <Ionicons
-              name={isSaved ? 'heart' : 'heart-outline'}
+              name={isSaved ? "heart" : "heart-outline"}
               size={23}
               color={COLORS.white}
             />
@@ -332,42 +303,26 @@ export default function ExploreScreen() {
           </Text>
 
           <View style={styles.ratingContainer}>
-            <Ionicons
-              name="star"
-              size={10}
-              color={COLORS.chocolate}
-            />
-            <Text style={styles.cardRating}>
-              {item.rating}
-            </Text>
+            <Ionicons name="star" size={10} color={COLORS.chocolate} />
+            <Text style={styles.cardRating}>{item.rating}</Text>
           </View>
         </View>
       </Pressable>
     );
   };
 
-  const renderSection = (
-    title: string,
-    data: TravelCardData[],
-  ) => (
+  const renderSection = (title: string, data: TravelCardData[]) => (
     <View style={styles.section} key={title}>
       <View style={styles.sectionHeading}>
-        <Text style={styles.sectionTitle}>
-          {title}
-        </Text>
+        <Text style={styles.sectionTitle}>{title}</Text>
 
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`See all ${title.toLowerCase()}`}
-          onPress={() => {
-          }}
+          onPress={() => {}}
           hitSlop={10}
         >
-          <Ionicons
-            name="chevron-forward"
-            size={20}
-            color={COLORS.black}
-          />
+          <Ionicons name="chevron-forward" size={20} color={COLORS.black} />
         </Pressable>
       </View>
 
@@ -432,23 +387,16 @@ export default function ExploreScreen() {
           </ScrollView>
 
           <View
-            style={[
-              styles.brandRow,
-              { top: insets.top + 8 },
-            ]}
+            style={[styles.brandRow, { top: insets.top + 8 }]}
             pointerEvents="none"
           >
-            <Text style={styles.brand}>
-              ROMR˙
-            </Text>
+            <Text style={styles.brand}>ROMR˙</Text>
 
-            <Text style={styles.date}>
-              October 2
-            </Text>
+            <Text style={styles.date}>October 2</Text>
           </View>
 
           <Animated.View
-            pointerEvents={expanded ? 'auto' : 'none'}
+            pointerEvents={expanded ? "auto" : "none"}
             style={[
               styles.expandedContent,
               {
@@ -466,11 +414,7 @@ export default function ExploreScreen() {
               </Text>
 
               <View style={styles.weatherRow}>
-                <Ionicons
-                  name="sunny-outline"
-                  size={23}
-                  color={COLORS.white}
-                />
+                <Ionicons name="sunny-outline" size={23} color={COLORS.white} />
                 <Text style={styles.weatherText}>
                   {activeDestination.weather}
                 </Text>
@@ -497,15 +441,13 @@ export default function ExploreScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Save destination"
                 style={styles.roundAction}
-                onPress={() =>
-                  toggleSaved(activeDestination.name)
-                }
+                onPress={() => toggleSaved(activeDestination.name)}
               >
                 <Ionicons
                   name={
                     savedItems.includes(activeDestination.name)
-                      ? 'heart'
-                      : 'heart-outline'
+                      ? "heart"
+                      : "heart-outline"
                   }
                   size={24}
                   color={COLORS.white}
@@ -533,9 +475,7 @@ export default function ExploreScreen() {
               style={styles.planButton}
               onPress={openTrip}
             >
-              <Text style={styles.planButtonText}>
-                Plan this trip ✦
-              </Text>
+              <Text style={styles.planButtonText}>Plan this trip ✦</Text>
             </Pressable>
 
             <View style={styles.pagination}>
@@ -558,8 +498,8 @@ export default function ExploreScreen() {
             accessibilityRole="button"
             accessibilityLabel={
               expanded
-                ? 'Collapse destination slideshow'
-                : 'Expand destination slideshow'
+                ? "Collapse destination slideshow"
+                : "Expand destination slideshow"
             }
             onPress={toggleExpanded}
             style={[
@@ -569,24 +509,19 @@ export default function ExploreScreen() {
               },
             ]}
           >
-<View style={styles.notificationAvatar}>
-  <Image
-    source={{
-      uri: 'https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750',
-    }}
-    style={styles.notificationAvatarImage}
-  />
-</View>
+            <View style={styles.notificationAvatar}>
+              <Image
+                source={{
+                  uri: "https://www.thehealthy.com/wp-content/uploads/2022/01/GettyImages-1046941212-MLedit.jpg?fit=750%2C750",
+                }}
+                style={styles.notificationAvatarImage}
+              />
+            </View>
 
             <View style={styles.notificationTextContainer}>
-              <Text style={styles.notificationGreeting}>
-                Hey, Callie
-              </Text>
+              <Text style={styles.notificationGreeting}>Hey, Callie</Text>
 
-              <Text
-                style={styles.notificationMessage}
-                numberOfLines={1}
-              >
+              <Text style={styles.notificationMessage} numberOfLines={1}>
                 Your Japan trip planning is complete
               </Text>
             </View>
@@ -600,23 +535,13 @@ export default function ExploreScreen() {
         </Animated.View>
 
         <View style={styles.recommendations}>
-          {renderSection(
-            'Things to do near you',
-            thingsToDo,
-          )}
+          {renderSection("Things to do near you", thingsToDo)}
 
-          {renderSection(
-            'What others are doing',
-            communityTrips,
-          )}
+          {renderSection("What others are doing", communityTrips)}
 
-          {renderSection(
-            'Our best offers',
-            bestOffers,
-          )}
+          {renderSection("Our best offers", bestOffers)}
         </View>
       </ScrollView>
-
     </View>
   );
 }
@@ -638,9 +563,9 @@ const styles = StyleSheet.create({
 
   hero: {
     width: SCREEN_WIDTH,
-    overflow: 'hidden',
-    position: 'relative',
-    backgroundColor: '#16475B',
+    overflow: "hidden",
+    position: "relative",
+    backgroundColor: "#16475B",
     borderBottomLeftRadius: 36,
     borderBottomRightRadius: 36,
   },
@@ -652,27 +577,27 @@ const styles = StyleSheet.create({
   heroImage: {
     width: SCREEN_WIDTH,
     height: EXPANDED_HEIGHT,
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
 
   heroImageStyle: {
     width: SCREEN_WIDTH,
     height: EXPANDED_HEIGHT,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
 
   imageShade: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0, 24, 38, 0.36)',
+    backgroundColor: "rgba(0, 24, 38, 0.36)",
   },
 
   brandRow: {
-    position: 'absolute',
+    position: "absolute",
     left: 40,
     right: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     zIndex: 11,
   },
 
@@ -690,39 +615,39 @@ const styles = StyleSheet.create({
   },
 
   notification: {
-    position: 'absolute',
+    position: "absolute",
     left: 38,
     right: 38,
     minHeight: 64,
     paddingVertical: 9,
     paddingHorizontal: 11,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderRadius: 36,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.65)',
-    backgroundColor: 'rgba(214, 226, 233, 0.32)',
+    borderColor: "rgba(255,255,255,0.65)",
+    backgroundColor: "rgba(214, 226, 233, 0.32)",
     zIndex: 12,
   },
 
-notificationAvatar: {
-  width: 35,
-  height: 35,
-  borderRadius: 22,
-  overflow: 'hidden',
-  backgroundColor: '#E7E7F1',
-  marginRight: 6,
-},
+  notificationAvatar: {
+    width: 35,
+    height: 35,
+    borderRadius: 22,
+    overflow: "hidden",
+    backgroundColor: "#E7E7F1",
+    marginRight: 6,
+  },
 
-notificationAvatarImage: {
-  width: '100%',
-  height: '100%',
-  borderRadius: 22,
-},
+  notificationAvatarImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 22,
+  },
 
   notificationTextContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     marginRight: 6,
   },
 
@@ -746,8 +671,8 @@ notificationAvatarImage: {
   },
 
   destinationDetails: {
-    position: 'absolute',
-    top: '29%',
+    position: "absolute",
+    top: "29%",
     left: 39,
     right: 95,
     zIndex: 3,
@@ -756,7 +681,7 @@ notificationAvatarImage: {
   destinationSubtitle: {
     fontFamily: FONTS.regular,
     fontSize: 15,
-    color: 'rgba(255,255,255,0.9)',
+    color: "rgba(255,255,255,0.9)",
     marginBottom: 1,
   },
 
@@ -770,31 +695,31 @@ notificationAvatarImage: {
   },
 
   weatherRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 7,
     gap: 7,
   },
 
   weatherText: {
     fontFamily: FONTS.italics,
-    color: 'rgba(255,255,255,0.9)',
+    color: "rgba(255,255,255,0.9)",
     fontSize: 19,
   },
 
   destinationDescription: {
     fontFamily: FONTS.regular,
-    color: 'rgba(255,255,255,0.85)',
+    color: "rgba(255,255,255,0.85)",
     fontSize: 12,
     lineHeight: 18,
     marginTop: 5,
   },
 
   heroActions: {
-    position: 'absolute',
+    position: "absolute",
     right: 24,
-    top: '29%',
-    alignItems: 'center',
+    top: "29%",
+    alignItems: "center",
     gap: 9,
     zIndex: 4,
   },
@@ -803,28 +728,28 @@ notificationAvatarImage: {
     width: 54,
     height: 54,
     borderRadius: 28,
-    backgroundColor: 'rgba(220, 231, 235, 0.38)',
-    borderColor: 'rgba(255,255,255,0.75)',
+    backgroundColor: "rgba(220, 231, 235, 0.38)",
+    borderColor: "rgba(255,255,255,0.75)",
     borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   diagonalArrow: {
-    transform: [{ rotate: '45deg' }],
+    transform: [{ rotate: "45deg" }],
   },
 
   planButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 63,
-    alignSelf: 'center',
+    alignSelf: "center",
     minHeight: 45,
     paddingHorizontal: 17,
     paddingVertical: 9,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: COLORS.white,
-    borderColor: '#D9B9D0',
+    borderColor: "#D9B9D0",
     borderWidth: 2,
     borderRadius: 26,
     zIndex: 8,
@@ -833,16 +758,16 @@ notificationAvatarImage: {
   planButtonText: {
     fontFamily: FONTS.semibold,
     fontSize: 17,
-    color: '#333333',
+    color: "#333333",
   },
 
   pagination: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 27,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 4,
     zIndex: 8,
   },
@@ -851,7 +776,7 @@ notificationAvatarImage: {
     width: 16,
     height: 7,
     borderRadius: 5,
-    backgroundColor: 'rgba(255,255,255,0.72)',
+    backgroundColor: "rgba(255,255,255,0.72)",
   },
 
   activeDot: {
@@ -871,9 +796,9 @@ notificationAvatarImage: {
   sectionHeading: {
     paddingHorizontal: 20,
     marginBottom: 11,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
   sectionTitle: {
@@ -897,18 +822,18 @@ notificationAvatarImage: {
     height: 146,
     width: 160,
     borderRadius: 15,
-    overflow: 'hidden',
+    overflow: "hidden",
     backgroundColor: COLORS.blue,
-    position: 'relative',
+    position: "relative",
   },
 
   cardImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
 
   popularTag: {
-    position: 'absolute',
+    position: "absolute",
     top: 11,
     left: 11,
     paddingHorizontal: 12,
@@ -924,13 +849,13 @@ notificationAvatarImage: {
   },
 
   cardHeart: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
     width: 30,
     height: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   cardTitle: {
@@ -942,28 +867,28 @@ notificationAvatarImage: {
   },
 
   cardMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
   cardPrice: {
     fontFamily: FONTS.regular,
-    color: '#555555',
+    color: "#555555",
     fontSize: 9,
     flexShrink: 1,
     marginRight: 4,
   },
 
   ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 3,
   },
 
   cardRating: {
     fontFamily: FONTS.regular,
-    color: '#555555',
+    color: "#555555",
     fontSize: 9,
   },
 });
