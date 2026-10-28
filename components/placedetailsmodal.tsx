@@ -53,7 +53,7 @@ type PlaceDetailsModalProps = {
 const COLORS = {
   background: "#E7E7F1",
   card: "#FFFFFF",
-  text: "#27283B",
+  text: "#0B1049",
   muted: "#77788D",
   accent: "#7C78B8",
   accentLight: "#F0EFFB",
@@ -342,10 +342,7 @@ export default function PlaceDetailsModal({
                       </View>
 
                       {place.pros.map((item, index) => (
-                        <View
-                          style={styles.bulletRow}
-                          key={`pro-${index}`}
-                        >
+                        <View style={styles.bulletRow} key={`pro-${index}`}>
                           <Ionicons
                             name="checkmark-circle"
                             size={16}
@@ -374,10 +371,7 @@ export default function PlaceDetailsModal({
                       </View>
 
                       {place.cons.map((item, index) => (
-                        <View
-                          style={styles.bulletRow}
-                          key={`con-${index}`}
-                        >
+                        <View style={styles.bulletRow} key={`con-${index}`}>
                           <Ionicons
                             name="alert-circle-outline"
                             size={16}
@@ -430,10 +424,7 @@ export default function PlaceDetailsModal({
                 >
                   <View style={styles.card}>
                     {place.customs.map((custom, index) => (
-                      <View
-                        style={styles.customRow}
-                        key={`custom-${index}`}
-                      >
+                      <View style={styles.customRow} key={`custom-${index}`}>
                         <View style={styles.customNumber}>
                           <Text style={styles.customNumberText}>
                             {index + 1}
@@ -780,16 +771,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   chatButtonText: {
-    color: "#FFFFFF",
+    color: "#0B1049",
     fontFamily: FONTS.semiBold,
     fontSize: 10,
   },
   buttonPressed: {
     opacity: 0.8,
   },
-  offerDetailsWrap: { marginTop: -4, 
-    marginBottom: 12, 
-    marginHorizontal: 16 
+  offerDetailsWrap: {
+    marginTop: -4,
+    marginBottom: 12,
+    marginHorizontal: 16,
   },
   offerDetailsBadge: {
     alignSelf: "flex-start",
@@ -861,8 +853,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
     lineHeight: 16,
   },
-  offerDetailsSection: { 
-    marginHorizontal: 0 
+  offerDetailsSection: {
+    marginHorizontal: 0,
   },
   footerNote: {
     fontFamily: FONTS.italic,
