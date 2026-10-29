@@ -73,6 +73,11 @@ export default function Navbar() {
     }).start();
   }, [activeIndex, navbarWidth, tabWidth, slideX]);
 
+  // Trip screens ("/planner/<tripId>" and below) have their own bottom input bar.
+  if (/^\/planner\/[^/]+/.test(pathname)) {
+    return null;
+  }
+
   return (
     <View
       pointerEvents="box-none"
