@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -13,9 +15,8 @@ import {
   Text,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSaved } from "../../../context/savedContext";
 
 import PlaceDetailsModal, {
   type PlaceDetails,
@@ -281,10 +282,8 @@ export default function ExploreScreen() {
   const activeIndexRef = useRef(0);
 
   const [expanded, setExpanded] = useState(false);
-  const [savedItems, setSavedItems] = useState<string[]>([]);
-  const [selectedPlace, setSelectedPlace] = useState<PlaceDetails | null>(
-    null,
-  );
+  const { savedItems, toggleSaved } = useSaved();
+  const [selectedPlace, setSelectedPlace] = useState<PlaceDetails | null>(null);
   const [placeDetailsVisible, setPlaceDetailsVisible] = useState(false);
 
   const activeDestination = destinations[activeIndex];
@@ -347,24 +346,13 @@ export default function ExploreScreen() {
 
     const index = Math.max(
       0,
-      Math.min(
-        destinations.length - 1,
-        Math.round(offsetX / SCREEN_WIDTH),
-      ),
+      Math.min(destinations.length - 1, Math.round(offsetX / SCREEN_WIDTH)),
     );
 
     if (index !== activeIndexRef.current) {
       activeIndexRef.current = index;
       setActiveIndex(index);
     }
-  };
-
-  const toggleSaved = (id: string) => {
-    setSavedItems((previous) =>
-      previous.includes(id)
-        ? previous.filter((item) => item !== id)
-        : [...previous, id],
-    );
   };
 
   const openPlace = (id: string) => {
@@ -534,9 +522,7 @@ export default function ExploreScreen() {
           <View style={styles.offerPriceRow}>
             <Text style={styles.offerPrice}>{item.price}</Text>
 
-            <Text style={styles.offerWasPrice}>
-              get away for a little less
-            </Text>
+            <Text style={styles.offerWasPrice}>get away for a little less</Text>
           </View>
 
           <View style={styles.offerRating}>
@@ -594,8 +580,7 @@ export default function ExploreScreen() {
       );
     }
 
-    const category =
-      title === "Things to do near you" ? "things" : "community";
+    const category = title === "Things to do near you" ? "things" : "community";
 
     return (
       <View style={styles.section} key={title}>
@@ -608,11 +593,7 @@ export default function ExploreScreen() {
             onPress={() => openCategory(category)}
             hitSlop={10}
           >
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={COLORS.navy}
-            />
+            <Ionicons name="chevron-forward" size={20} color={COLORS.navy} />
           </Pressable>
         </View>
 
@@ -735,10 +716,7 @@ export default function ExploreScreen() {
               <View style={styles.inspirationCardBottom}>
                 <Text style={styles.inspirationCardTitle}>{item.title}</Text>
 
-                <Text
-                  style={styles.inspirationCardSubtitle}
-                  numberOfLines={2}
-                >
+                <Text style={styles.inspirationCardSubtitle} numberOfLines={2}>
                   {item.subtitle}
                 </Text>
               </View>
@@ -817,11 +795,7 @@ export default function ExploreScreen() {
               </Text>
 
               <View style={styles.weatherRow}>
-                <Ionicons
-                  name="sunny-outline"
-                  size={23}
-                  color={COLORS.white}
-                />
+                <Ionicons name="sunny-outline" size={23} color={COLORS.white} />
                 <Text style={styles.weatherText}>
                   {activeDestination.weather}
                 </Text>

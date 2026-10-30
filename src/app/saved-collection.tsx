@@ -1,11 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 import { useSaved } from "../../context/savedContext";
 
@@ -67,45 +68,97 @@ const destinations = [
 ];
 
 export default function SavedCollection() {
-  const { savedItems } = useSaved();
+  const { savedItems, toggleSaved } = useSaved();
 
   const savedDestinations = destinations.filter((destination) =>
     savedItems.includes(destination.id),
   );
 
   return (
-    <ScrollView style={styles.container}>
-      <Pressable onPress={() => router.replace("/saved")}>
-        <Text style={styles.backArrow}>←</Text>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+    >
+      {/* Back button */}
+      <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color="#34294F" />
       </Pressable>
 
+      {/* Page heading */}
       <Text style={styles.title}>My Dream Destinations</Text>
 
-      {savedDestinations.length === 0 ? (
-        <Text style={styles.emptyText}>
-          No saved destinations yet. Go to Explore and tap a heart to save your
-          favourite places!
+      <Text style={styles.subtitle}>All the places you love</Text>
+
+      {/* Destination counter */}
+      <View style={styles.counterContainer}>
+        <Ionicons name="heart" size={18} color="#E888AC" />
+
+        <Text style={styles.counterText}>
+          {savedDestinations.length} saved destination
+          {savedDestinations.length === 1 ? "" : "s"}
         </Text>
-      ) : (
-        savedDestinations.map((destination) => (
-          <View key={destination.id} style={styles.destinationCard}>
-            <Image
-              source={{ uri: destination.image }}
-              style={styles.destinationImage}
-              resizeMode="cover"
-            />
+      </View>
 
-            <Text style={styles.destinationName}>{destination.name}</Text>
-
-            <Text style={styles.destinationLocation}>
-              {destination.location}
-            </Text>
-
-            <Pressable style={styles.detailsButton}>
-              <Text style={styles.detailsButtonText}>View Details</Text>
-            </Pressable>
+      {/* Empty state */}
+      {savedDestinations.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <View style={styles.emptyIcon}>
+            <Ionicons name="heart-outline" size={42} color="#B69DCE" />
           </View>
-        ))
+
+          <Text style={styles.emptyTitle}>Your wishlist is waiting!</Text>
+
+          <Text style={styles.emptyText}>
+            Explore beautiful destinations and tap the heart to save your
+            favourites here
+          </Text>
+
+          <Pressable
+            style={styles.exploreButton}
+            onPress={() => router.push("/")}
+          >
+            <Ionicons name="compass-outline" size={18} color="#FFFFFF" />
+
+            <Text style={styles.exploreButtonText}>Explore</Text>
+          </Pressable>
+        </View>
+      ) : (
+        /* Two-column destination grid */
+        <View style={styles.grid}>
+          {savedDestinations.map((destination) => (
+            <View key={destination.id} style={styles.destinationCard}>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{ uri: destination.image }}
+                  style={styles.destinationImage}
+                  resizeMode="cover"
+                />
+
+                {/* Heart button */}
+                <Pressable
+                  style={styles.heartButton}
+                  onPress={() => toggleSaved(destination.id)}
+                >
+                  <Ionicons name="heart" size={20} color="#E888AC" />
+                </Pressable>
+              </View>
+
+              <View style={styles.cardText}>
+                <Text style={styles.destinationName} numberOfLines={2}>
+                  {destination.name}
+                </Text>
+
+                <View style={styles.locationRow}>
+                  <Ionicons name="location-outline" size={13} color="#847698" />
+
+                  <Text style={styles.destinationLocation} numberOfLines={2}>
+                    {destination.location}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
       )}
     </ScrollView>
   );
@@ -114,70 +167,172 @@ export default function SavedCollection() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E7E7F1",
+    backgroundColor: "#FFFFFF",
   },
 
-  backArrow: {
-    fontSize: 28,
-    color: "#3E3630",
-    marginLeft: 20,
-    marginTop: 20,
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 50,
+    flexGrow: 1,
+  },
+
+  backButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: "#EAF3FF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 25,
   },
 
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#3E3630",
-    marginTop: 40,
-    marginLeft: 20,
+    fontFamily: "BeVietnamProBold",
+    fontSize: 25,
+    color: "#1D2939",
+  },
+
+  subtitle: {
+    fontFamily: "BeVietnamProRegular",
+    fontSize: 14,
+    color: "#667085",
+    marginTop: 9,
+    lineHeight: 21,
+  },
+
+  counterContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    backgroundColor: "#EAF3FF",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginTop: 22,
+    marginBottom: 25,
+    gap: 8,
+  },
+
+  counterText: {
+    fontFamily: "BeVietnamProSemiBold",
+    fontSize: 13,
+    color: "#3478E5",
+  },
+
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 12,
   },
 
   destinationCard: {
-    backgroundColor: "#FFFFFF",
-    marginHorizontal: 20,
-    marginTop: 20,
-    padding: 20,
-    borderRadius: 16,
+    width: "48%",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 18,
+    overflow: "hidden",
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#EDF2F7",
+  },
+
+  imageContainer: {
+    position: "relative",
   },
 
   destinationImage: {
     width: "100%",
-    height: 180,
-    borderRadius: 12,
-    marginBottom: 12,
+    height: 165,
+    backgroundColor: "#EAF3FF",
+  },
+
+  heartButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  cardText: {
+    padding: 12,
   },
 
   destinationName: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#3E3630",
-    marginBottom: 4,
+    fontFamily: "BeVietnamProBold",
+    fontSize: 14,
+    color: "#1D2939",
+  },
+
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 4,
+    marginTop: 6,
   },
 
   destinationLocation: {
-    fontSize: 14,
-    color: "#777777",
+    fontFamily: "BeVietnamProRegular",
+    fontSize: 11,
+    color: "#667085",
+    flex: 1,
+    lineHeight: 16,
   },
 
-  detailsButton: {
-    backgroundColor: "#3E3630",
-    paddingVertical: 12,
-    borderRadius: 12,
+  emptyContainer: {
+    flex: 1,
     alignItems: "center",
-    marginTop: 15,
+    justifyContent: "center",
+    paddingHorizontal: 15,
+    paddingBottom: 60,
   },
 
-  detailsButtonText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "600",
+  emptyIcon: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: "#EAF3FF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  emptyTitle: {
+    fontFamily: "BeVietnamProBold",
+    fontSize: 20,
+    color: "#1D2939",
+    textAlign: "center",
   },
 
   emptyText: {
-    fontSize: 15,
-    color: "#777777",
-    marginHorizontal: 20,
-    marginTop: 30,
-    lineHeight: 24,
+    fontFamily: "BeVietnamProRegular",
+    fontSize: 14,
+    color: "#667085",
+    textAlign: "center",
+    lineHeight: 23,
+    marginTop: 12,
+    marginBottom: 25,
+  },
+
+  exploreButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#3478E5",
+    paddingHorizontal: 22,
+    paddingVertical: 14,
+    borderRadius: 25,
+    gap: 8,
+  },
+
+  exploreButtonText: {
+    fontFamily: "BeVietnamProSemiBold",
+    color: "#FFFFFF",
+    fontSize: 14,
   },
 });
+
