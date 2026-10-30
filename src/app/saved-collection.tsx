@@ -8,7 +8,7 @@ import {
     Text,
     View,
 } from "react-native";
-import { useSaved } from "./context/SavedContext";
+import { useSaved } from "../../context/savedContext";
 
 const destinations = [
   {
@@ -335,3 +335,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+

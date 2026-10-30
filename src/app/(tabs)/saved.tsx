@@ -16,7 +16,7 @@ import {
   View,
 } from "react-native";
 
-import { useSaved } from "../context/SavedContext";
+import { useSaved } from "../../../context/savedContext";
 
 export default function Saved() {
   const { savedItems } = useSaved();
@@ -580,3 +580,4 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
+

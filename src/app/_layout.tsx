@@ -1,16 +1,17 @@
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import { SavedProvider } from "./context/SavedContext";
+import React from 'react';
+import { Stack } from 'expo-router';
+import { useFonts } from 'expo-font';
+import { SavedProvider } from '../../context/savedContext';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    BeVietnamProRegular: require("../../assets/fonts/BeVietnamPro-Regular.ttf"),
-    BeVietnamProMedium: require("../../assets/fonts/BeVietnamPro-Medium.ttf"),
-    BeVietnamProSemiBold: require("../../assets/fonts/BeVietnamPro-SemiBold.ttf"),
-    BeVietnamProItalics: require("../../assets/fonts/BeVietnamPro-Italic.ttf"),
-    BeVietnamProSemiBoldItalics: require("../../assets/fonts/BeVietnamPro-SemiBoldItalic.ttf"),
-    BeVietnamProBold: require("../../assets/fonts/BeVietnamPro-Bold.ttf"),
-    BeVietnamProBoldItalics: require("../../assets/fonts/BeVietnamPro-BoldItalic.ttf"),
+    BeVietnamProRegular: require('../../assets/fonts/BeVietnamPro-Regular.ttf'),
+    BeVietnamProMedium: require('../../assets/fonts/BeVietnamPro-Medium.ttf'),
+    BeVietnamProSemiBold: require('../../assets/fonts/BeVietnamPro-SemiBold.ttf'),
+    BeVietnamProItalics: require('../../assets/fonts/BeVietnamPro-Italic.ttf'),
+    BeVietnamProSemiBoldItalics: require('../../assets/fonts/BeVietnamPro-SemiBoldItalic.ttf'),
+    BeVietnamProBold: require('../../assets/fonts/BeVietnamPro-Bold.ttf'),
+    BeVietnamProBoldItalics: require('../../assets/fonts/BeVietnamPro-BoldItalic.ttf'),
   });
 
   if (!fontsLoaded) {
