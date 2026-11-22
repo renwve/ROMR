@@ -1,0 +1,78 @@
+import { Image } from 'expo-image';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { colors, fonts } from '@/constants/theme';
+import { useNewPlan } from '@/features/new-plan/NewPlanContext';
+
+// Figma "Frame 152": a 24pt icon each side of a centred title, 16pt padding,
+// directly under the status bar.
+function HeaderRow({ left, title, right }: { left: React.ReactNode; title: string; right: React.ReactNode }) {
+  return (
+    <View style={styles.row}>
+      {left}
+      <Text style={styles.title}>{title}</Text>
+      {right}
+    </View>
+  );
+}
+
+// Explore's header: the R mark, "Hi, Roamer" and notifications.
+export function HomeHeader() {
+  return (
+    <HeaderRow
+      left={<Image source={require('@/assets/icons/romr-r.svg')} style={styles.icon} />}
+      title="Hi, Roamer"
+      right={
+        <Pressable accessibilityRole="button" accessibilityLabel="Notifications" hitSlop={10}>
+          <Image source={require('@/assets/icons/bell.svg')} style={styles.icon} />
+        </Pressable>
+      }
+    />
+  );
+}
+
+// Figma "New Plan": shown while the trip input is focused. X leaves New Plan.
+export function NewPlanHeader() {
+  const { close } = useNewPlan();
+  return (
+    <HeaderRow
+      left={
+        <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={10} onPress={close}>
+          <Image source={require('@/assets/icons/x.svg')} style={styles.icon} />
+        </Pressable>
+      }
+      title="New Plan"
+      right={
+        <Pressable accessibilityRole="button" accessibilityLabel="More options" hitSlop={10}>
+          <Image source={require('@/assets/icons/dots-three.svg')} style={styles.icon} />
+        </Pressable>
+      }
+    />
+  );
+}
+
+// Clears the status bar, which every page draws under.
+export function StatusBarSpace() {
+  return <View style={{ height: useSafeAreaInsets().top }} />;
+}
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  title: {
+    fontFamily: fonts.semiBold,
+    fontSize: 16,
+    lineHeight: 20,
+    letterSpacing: -0.8,
+    color: colors.gray400,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+  },
+});
