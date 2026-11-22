@@ -1,7 +1,5 @@
-import React from 'react';
-import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
-import { SavedProvider } from '../../context/savedContext';
+import { Stack } from 'expo-router';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -18,12 +16,5 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <SavedProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </SavedProvider>
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
