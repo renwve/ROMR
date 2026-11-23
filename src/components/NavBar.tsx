@@ -14,7 +14,7 @@ import Animated, {
 
 import { ScalePressable } from '@/components/ScalePressable';
 import { SLIDE } from '@/constants/motion';
-import { colors, fonts } from '@/constants/theme';
+import { colors, fonts, shadows } from '@/constants/theme';
 import { useNewPlan } from '@/features/new-plan/NewPlanContext';
 import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 
@@ -65,6 +65,10 @@ const INPUT_REST = BOTTOM + NAV_WITH_INPUT - INPUT_CARD;
 // In New Plan with the keyboard down ("New Plan - Keyboard Hidden") it takes
 // the nav bar's place instead, BOTTOM off the screen's bottom edge.
 export const PLAN_REST = BOTTOM;
+// How much of the page's bottom the nav bar covers on Explore and Planner.
+export const NAV_CLEARANCE = BOTTOM + NAV_WITH_INPUT;
+// The same for pages without the trip input (Saved, Account).
+export const NAV_TABS_CLEARANCE = BOTTOM + NAV_TABS_ONLY;
 // In New Plan with the keyboard up, it floats this far above the keyboard.
 export const KEYBOARD_GAP = 12;
 
@@ -269,8 +273,6 @@ function TripInput({
   );
 }
 
-const CARD_SHADOW = '0px 0px 30px 0px rgba(0, 0, 0, 0.1)';
-
 const styles = StyleSheet.create({
   wrap: {
     position: 'absolute',
@@ -287,7 +289,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 28,
     // Figma's stroke sits inside the frame, so the 4pt inset includes it.
     padding: INSET - 1,
-    boxShadow: CARD_SHADOW,
+    boxShadow: shadows.soft,
   },
   tabs: {
     flexDirection: 'row',
@@ -334,7 +336,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.white200,
     borderRadius: 12,
-    boxShadow: CARD_SHADOW,
+    boxShadow: shadows.soft,
   },
   inputRow: {
     height: INPUT_ROW,

@@ -7,12 +7,11 @@
     "icon": "./assets/images/icon.png",
     "scheme": "romr",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/expo.icon"
-    },
+    "ios": {},
     "android": {
+      "package": "com.romr.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#C0CAF9",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -28,6 +27,8 @@
       [
         "expo-splash-screen",
         {
+          "image": "./assets/images/splash-blank.png",
+          "imageWidth": 1,
           "backgroundColor": "#FFFFFF"
         }
       ],
