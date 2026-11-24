@@ -2,13 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
 } from "react-native";
 
 const COLORS = {
@@ -60,7 +60,6 @@ function SettingsRow({
 
 export default function SettingsScreen() {
   const [anonymous, setAnonymous] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
 
   const notConnected = (feature: string) => {
     Alert.alert(
@@ -134,9 +133,27 @@ export default function SettingsScreen() {
         <View style={styles.card}>
           <SettingsRow
             icon="person-outline"
-            title="Account Settings"
-            subtitle="Personal information and password"
-            onPress={() => notConnected("Account Settings")}
+            title="Personal Information"
+            subtitle="Manage your name and email."
+            onPress={() => notConnected("Personal Information ")}
+          />
+          <View style={styles.divider} />
+          <SettingsRow
+            icon="lock-closed-outline"
+            title="Password & Security"
+            subtitle="Manage your password and account security"
+            onPress={() => notConnected("Password & Security")}
+          />
+        </View>
+
+        <Text style={styles.sectionTitle}>NOTIFICATIONS</Text>
+
+        <View style={styles.card}>
+          <SettingsRow
+            icon="notifications-outline"
+            title="Notification Preferences"
+            subtitle="Manage your travel alerts and updates"
+            onPress={() => notConnected("Notification Preferences")}
           />
         </View>
 
@@ -161,48 +178,33 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>APPEARANCE</Text>
-        <View style={styles.card}>
-          <View style={styles.appearanceHeader}>
-            <Ionicons name="moon-outline" size={21} color={COLORS.navy} />
-            <Text style={styles.rowTitle}>App Theme</Text>
-          </View>
+        <Text style={styles.sectionTitle}>SUPPORT & ABOUT</Text>
 
-          <View style={styles.themeOptions}>
-            {(["light", "dark", "system"] as const).map((option) => (
-              <Pressable
-                key={option}
-                onPress={() => setTheme(option)}
-                style={[
-                  styles.themeOption,
-                  theme === option && styles.selectedTheme,
-                ]}
-              >
-                <Ionicons
-                  name={
-                    option === "light"
-                      ? "sunny-outline"
-                      : option === "dark"
-                        ? "moon-outline"
-                        : "phone-portrait-outline"
-                  }
-                  size={19}
-                  color={theme === option ? COLORS.white : COLORS.navy}
-                />
-                <Text
-                  style={[
-                    styles.themeText,
-                    theme === option && styles.selectedThemeText,
-                  ]}
-                >
-                  {option.charAt(0).toUpperCase() + option.slice(1)}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-          <Text style={styles.helperText}>
-            Theme selection preview. App-wide theme support is coming later.
-          </Text>
+        <View style={styles.card}>
+          <SettingsRow
+            icon="help-circle-outline"
+            title="Help & Support"
+            subtitle="Get help using ROMR"
+            onPress={() => notConnected("Help & Support")}
+          />
+
+          <View style={styles.divider} />
+
+          <SettingsRow
+            icon="chatbubble-outline"
+            title="Send Feedback"
+            subtitle="Help us improve your experience"
+            onPress={() => notConnected("Send Feedback")}
+          />
+
+          <View style={styles.divider} />
+
+          <SettingsRow
+            icon="shield-checkmark-outline"
+            title="Privacy Policy"
+            subtitle="Learn how we handle your data"
+            onPress={() => notConnected("Privacy Policy")}
+          />
         </View>
 
         <Text style={styles.sectionTitle}>DATA & SECURITY</Text>
@@ -331,46 +333,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
     marginLeft: 65,
   },
-  appearanceHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    padding: 17,
-  },
-  themeOptions: {
-    flexDirection: "row",
-    paddingHorizontal: 15,
-    gap: 8,
-  },
-  themeOption: {
-    flex: 1,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 13,
-    gap: 7,
-  },
-  selectedTheme: {
-    backgroundColor: COLORS.navy,
-    borderColor: COLORS.navy,
-  },
-  themeText: {
-    fontFamily: "BeVietnamProMedium",
-    fontSize: 11,
-    color: COLORS.navy,
-  },
-  selectedThemeText: {
-    color: COLORS.white,
-  },
-  helperText: {
-    fontFamily: "BeVietnamProRegular",
-    fontSize: 10,
-    color: COLORS.grey,
-    paddingHorizontal: 16,
-    paddingVertical: 13,
-  },
+
   signOut: {
     marginTop: 28,
     backgroundColor: COLORS.white,
