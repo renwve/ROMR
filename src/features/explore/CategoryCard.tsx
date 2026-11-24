@@ -4,14 +4,17 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { ScalePressable } from '@/components/ScalePressable';
 import { colors, fonts } from '@/constants/theme';
+import { useToast } from '@/features/toast/ToastContext';
 
 export const CATEGORY_CARD_WIDTH = 240;
 
 // Figma component set "Category Card": a place in one of Explore's category
 // rows, with a heart to save it. The heart is an outline by default and fills
-// pink once saved ("Card Saved"); tapping it toggles.
+// pink once saved ("Card Saved"); tapping it toggles. Saving shows the "Plan
+// Saved" toast.
 export function CategoryCard({ title, detail }: { title: string; detail: string }) {
   const [saved, setSaved] = useState(false);
+  const { showPlanSaved } = useToast();
 
   return (
     <View style={styles.card}>
@@ -26,10 +29,15 @@ export function CategoryCard({ title, detail }: { title: string; detail: string 
           accessibilityLabel="Save"
           accessibilityState={{ selected: saved }}
           hitSlop={12}
-          onPress={() => setSaved((value) => !value)}>
+          onPress={() => {
+            if (!saved) showPlanSaved();
+            setSaved(!saved);
+          }}>
           <Image
             source={
-              saved ? require('@/assets/icons/heart-saved.svg') : require('@/assets/icons/heart.svg')
+              saved
+                ? require('@/assets/icons/heart-saved.svg')
+                : require('@/assets/icons/heart.svg')
             }
             style={styles.heart}
           />

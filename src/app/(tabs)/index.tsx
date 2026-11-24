@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { CategoryTabs } from '@/components/CategoryTabs';
@@ -16,9 +16,10 @@ const CATEGORY_ICONS: Record<Category, number> = {
   'Hang Out': require('@/assets/icons/air-traffic-control.svg'),
 };
 
-// How long after a category is first opened its page is built: about as long
-// as the tabs take to move, so building it doesn't hold them up.
-const PAGE_BUILD_DELAY_MS = 350;
+// The pages after the first are built while the launch splash is still up
+// (it holds for 1.4s before zooming), one at a time so the splash keeps moving
+// smoothly: each this long after the one before.
+const PAGE_BUILD_STAGGER_MS = 300;
 
 // Figma "Explore/Home"; during a New Plan, Figma "New Plan" and "New Plan - Chatting".
 export default function ExploreScreen() {
@@ -27,28 +28,25 @@ export default function ExploreScreen() {
   // Which side the current category's page slides in from: the side its tab
   // is on, relative to the last one. None on first show.
   const [enterFrom, setEnterFrom] = useState<'left' | 'right' | null>(null);
-  // Categories opened so far. A page is only built the first time it's opened,
-  // then kept, so launching the app builds one page rather than all of them.
-  const [opened, setOpened] = useState<Category[]>(['Travel']);
-  // Opened categories whose page is built. A newly opened one shows a skeleton
-  // first and is built a moment later, so the tabs' own animation runs
-  // straight away instead of waiting on the page.
-  const [loaded, setLoaded] = useState<Category[]>(['Travel']);
-  const loadTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Categories whose page is built. Travel's is built straight away; the rest
+  // follow during the launch splash, so switching to them is instant. (One
+  // opened before it's built shows the loading skeleton until it is.)
+  const [loaded, setLoaded] = useState<Category[]>([CATEGORIES[0]]);
 
-  useEffect(() => () => clearTimeout(loadTimer.current), []);
+  useEffect(() => {
+    const timers = CATEGORIES.slice(1).map((option, index) =>
+      setTimeout(
+        () => setLoaded((done) => (done.includes(option) ? done : [...done, option])),
+        PAGE_BUILD_STAGGER_MS * (index + 1),
+      ),
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   const changeCategory = (next: Category) => {
     if (next === category) return;
     setEnterFrom(CATEGORIES.indexOf(next) > CATEGORIES.indexOf(category) ? 'right' : 'left');
     setCategory(next);
-    if (!opened.includes(next)) {
-      setOpened([...opened, next]);
-      loadTimer.current = setTimeout(
-        () => setLoaded((done) => (done.includes(next) ? done : [...done, next])),
-        PAGE_BUILD_DELAY_MS,
-      );
-    }
   };
 
   return (
@@ -73,7 +71,7 @@ export default function ExploreScreen() {
           {/* Every category keeps its own page, so each remembers where it was
               scrolled; only the selected one is on screen. */}
           <View style={styles.fill}>
-            {CATEGORIES.filter((option) => opened.includes(option)).map((option) => (
+            {CATEGORIES.map((option) => (
               <ExploreFeed
                 key={option}
                 content={EXPLORE_CONTENT[option]}

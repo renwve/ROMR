@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeOut, LinearTransition } from 'react-native-reanimated';
 
@@ -24,8 +23,6 @@ const CLOSE_UP = LinearTransition.duration(SLIDE.duration);
 // and can be swiped left to delete.
 export default function SavedScreen() {
   const { collections, removeCollection } = useCollections();
-  // The collection showing its delete button, if any (one at a time).
-  const [openId, setOpenId] = useState<string | null>(null);
 
   return (
     <View style={styles.page}>
@@ -42,16 +39,7 @@ export default function SavedScreen() {
               <DeletableCollection
                 name={collection.name}
                 count={PLACEHOLDER_COUNT}
-                open={openId === collection.id}
-                onOpenChange={(open) =>
-                  setOpenId((current) =>
-                    open ? collection.id : current === collection.id ? null : current,
-                  )
-                }
-                onDelete={() => {
-                  setOpenId(null);
-                  removeCollection(collection.id);
-                }}
+                onDelete={() => removeCollection(collection.id)}
               />
             </Animated.View>
           ))}

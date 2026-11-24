@@ -7,8 +7,6 @@ export const colors = {
   blue900: '#0B1049',
   gray100: '#D5D6E2',
   pink200: '#F4BED2',
-  // Not a Figma variable: the delete button's "Confirmed/Pressed" fill.
-  deleteRed: '#F56E70',
   gray200: '#B7B8CD',
   gray300: '#989BB8',
   gray400: '#7A7EA3',

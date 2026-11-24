@@ -7,6 +7,7 @@ import Animated, {
   interpolate,
   interpolateColor,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withTiming,
   type SharedValue,
@@ -16,6 +17,7 @@ import { ScalePressable } from '@/components/ScalePressable';
 import { SLIDE } from '@/constants/motion';
 import { colors, fonts, shadows } from '@/constants/theme';
 import { useNewPlan } from '@/features/new-plan/NewPlanContext';
+import { PlanSavedToast } from '@/features/toast/PlanSavedToast';
 import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 
 type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>['tabBar']>>[0];
@@ -98,12 +100,16 @@ export function NavBar({ state, navigation }: TabBarProps) {
     planMode.set(withTiming(active ? 1 : 0, SLIDE));
   }, [active, planMode]);
 
+  // The bar's height as its input section grows in and out (the toast above
+  // it follows this).
+  const barHeight = useDerivedValue(() => NAV_TABS_ONLY + INPUT_SECTION * inputShown.value);
+
   // Grows upward from the tabs, its top corners tightening from 28 to 12.
   // In New Plan it fades away, leaving the input on its own.
   const cardStyle = useAnimatedStyle(() => {
     const topRadius = interpolate(inputShown.value, [0, 1], [28, 12]);
     return {
-      height: NAV_TABS_ONLY + INPUT_SECTION * inputShown.value,
+      height: barHeight.value,
       borderTopLeftRadius: topRadius,
       borderTopRightRadius: topRadius,
       opacity: 1 - planMode.value,
@@ -116,6 +122,8 @@ export function NavBar({ state, navigation }: TabBarProps) {
 
   return (
     <View pointerEvents="box-none" style={styles.wrap}>
+      {/* First, so it's drawn behind the bar and comes out from under it. */}
+      <PlanSavedToast navHeight={barHeight} />
       <Animated.View pointerEvents={active ? 'none' : 'auto'} style={[styles.card, cardStyle]}>
         <View
           style={styles.tabs}
@@ -133,7 +141,8 @@ export function NavBar({ state, navigation }: TabBarProps) {
                 target: route.key,
                 canPreventDefault: true,
               });
-              if (!focused && !event.defaultPrevented) navigation.navigate(route.name, route.params);
+              if (!focused && !event.defaultPrevented)
+                navigation.navigate(route.name, route.params);
             };
             return (
               <TabButton

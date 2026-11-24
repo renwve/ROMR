@@ -50,7 +50,11 @@ export function NewPlanHeader() {
   return (
     <HeaderRow
       left={
-        <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={10} onPress={close}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          hitSlop={10}
+          onPress={close}>
           <Image source={require('@/assets/icons/x.svg')} style={styles.icon} />
         </Pressable>
       }
@@ -86,11 +90,24 @@ export function SavedHeader() {
 
 // Figma "Saved - New Collection": X to leave without saving, "New Collection",
 // and a check to create it.
-export function NewCollectionHeader({ onClose, onSave }: { onClose: () => void; onSave: () => void }) {
+// The check is disabled, in gray300, until `canSave`.
+export function NewCollectionHeader({
+  onClose,
+  onSave,
+  canSave,
+}: {
+  onClose: () => void;
+  onSave: () => void;
+  canSave: boolean;
+}) {
   return (
     <HeaderRow
       left={
-        <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={10} onPress={onClose}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          hitSlop={10}
+          onPress={onClose}>
           <Image source={require('@/assets/icons/x-navy.svg')} style={styles.icon} />
         </Pressable>
       }
@@ -100,9 +117,18 @@ export function NewCollectionHeader({ onClose, onSave }: { onClose: () => void; 
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Create collection"
+          accessibilityState={{ disabled: !canSave }}
+          disabled={!canSave}
           hitSlop={10}
           onPress={onSave}>
-          <Image source={require('@/assets/icons/check.svg')} style={styles.icon} />
+          <Image
+            source={
+              canSave
+                ? require('@/assets/icons/check.svg')
+                : require('@/assets/icons/check-gray.svg')
+            }
+            style={styles.icon}
+          />
         </Pressable>
       }
     />

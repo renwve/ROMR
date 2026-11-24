@@ -11,9 +11,6 @@ import { ScalePressable } from '@/components/ScalePressable';
 import { colors, fonts, shadows } from '@/constants/theme';
 import { useCollections } from '@/features/saved/CollectionsContext';
 
-// What a collection is called if it's created without a name.
-const UNNAMED = 'New Collection';
-
 // Placeholder saves to pick from until there's a backend: the user's saves,
 // i.e. everything in The Everything Collection.
 const SAVES = ['1', '2', '3', '4', '5', '6'].map((id) => ({ id, title: 'Title' }));
@@ -33,8 +30,12 @@ export default function NewCollectionScreen() {
       current.includes(id) ? current.filter((pickedId) => pickedId !== id) : [...current, id],
     );
 
+  // Leading spaces are dropped as they're typed, so spaces alone leave it empty.
+  const canSave = name.trim().length > 0;
+
   const create = () => {
-    addCollection(name.trim() || UNNAMED, picked);
+    if (!canSave) return;
+    addCollection(name.trim(), picked);
     router.back();
   };
 
@@ -50,7 +51,7 @@ export default function NewCollectionScreen() {
       <StatusBar style="dark" />
       <DismissKeyboard>
         <StatusBarSpace />
-        <NewCollectionHeader onClose={() => router.back()} onSave={create} />
+        <NewCollectionHeader onClose={() => router.back()} onSave={create} canSave={canSave} />
         <ScrollView
           style={styles.page}
           contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}
@@ -62,7 +63,7 @@ export default function NewCollectionScreen() {
             <View style={[styles.nameField, nameFocused && styles.nameFieldFocused]}>
               <TextInput
                 value={name}
-                onChangeText={setName}
+                onChangeText={(text) => setName(text.replace(/^\s+/, ''))}
                 onFocus={() => setNameFocused(true)}
                 onBlur={() => setNameFocused(false)}
                 returnKeyType="done"
