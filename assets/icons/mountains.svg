@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Mountains" clip-path="url(#clip0_0_29)">
+<path id="Vector" d="M17.25 4.875C17.25 5.91053 16.4105 6.75 15.375 6.75C14.3395 6.75 13.5 5.91053 13.5 4.875C13.5 3.83947 14.3395 3 15.375 3C16.4105 3 17.25 3.83947 17.25 4.875Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#0B1049"/>
+<path id="Vector_2" d="M0.75 18.75L7.60312 7.11937C7.6693 7.00659 7.76381 6.91307 7.87728 6.84809C7.99075 6.78311 8.11924 6.74892 8.25 6.74892C8.38076 6.74892 8.50925 6.78311 8.62272 6.84809C8.73619 6.91307 8.8307 7.00659 8.89688 7.11937L15.75 18.75H0.75Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#0B1049"/>
+<path id="Vector_3" d="M4.72031 12H11.7797" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#0B1049"/>
+<path id="Vector_4" d="M13.7447 15.3478L16.8441 10.1175C16.9105 10.0056 17.0049 9.91287 17.1179 9.84848C17.231 9.78408 17.3589 9.75022 17.4891 9.75022C17.6192 9.75022 17.7471 9.78408 17.8602 9.84848C17.9733 9.91287 18.0677 10.0056 18.1341 10.1175L23.25 18.75H15.75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#0B1049"/>
+</g>
+<defs>
+<clipPath id="clip0_0_29">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>

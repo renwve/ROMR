@@ -33,6 +33,12 @@
         }
       ],
       "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow ROMR to use your location to suggest places worth exploring nearby."
+        }
+      ],
       "./plugins/withShortNativeBuildPaths"
     ],
     "experiments": {

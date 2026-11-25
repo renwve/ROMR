@@ -13,6 +13,7 @@ export const colors = {
   gray500: '#60648B',
   gray700: '#36394E',
   dark800: '#18191B',
+  red600: '#E92E31',
 } as const;
 
 // Keys registered with useFonts in src/app/_layout.tsx.
@@ -22,6 +23,7 @@ export const fonts = {
   semiBold: 'BeVietnamProSemiBold',
   bold: 'BeVietnamProBold',
   black: 'BeVietnamProBlack',
+  blackItalic: 'BeVietnamProBlackItalic',
 } as const;
 
 // Effect styles from the ROMR Figma file, as CSS box shadows.
