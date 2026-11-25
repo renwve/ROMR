@@ -13,6 +13,7 @@ type CollectionsValue = {
   collections: Collection[];
   addCollection: (name: string, saveIds: string[]) => void;
   removeCollection: (id: string) => void;
+  renameCollection: (id: string, name: string) => void;
 };
 
 const CollectionsContext = createContext<CollectionsValue | null>(null);
@@ -33,8 +34,15 @@ export function CollectionsProvider({ children }: { children: ReactNode }) {
     setCollections((current) => current.filter((collection) => collection.id !== id));
   };
 
+  const renameCollection = (id: string, name: string) => {
+    setCollections((current) =>
+      current.map((collection) => (collection.id === id ? { ...collection, name } : collection)),
+    );
+  };
+
   return (
-    <CollectionsContext.Provider value={{ collections, addCollection, removeCollection }}>
+    <CollectionsContext.Provider
+      value={{ collections, addCollection, removeCollection, renameCollection }}>
       {children}
     </CollectionsContext.Provider>
   );

@@ -68,7 +68,8 @@ export function RubberBandScrollView({
       // frame's speed and the last one's.
       const frameSpeed = elapsed > 0 && elapsed < 100 ? (moved / elapsed) * 1000 : 0;
       const flingSpeed =
-        Math.sign(frameSpeed) === Math.sign(speed.get()) && Math.abs(speed.get()) > Math.abs(frameSpeed)
+        Math.sign(frameSpeed) === Math.sign(speed.get()) &&
+        Math.abs(speed.get()) > Math.abs(frameSpeed)
           ? speed.get()
           : frameSpeed;
       scrollY.set(y);
@@ -113,7 +114,7 @@ export function RubberBandScrollView({
   // The ScrollView's own scrolling, which the pull below runs alongside.
   const native = Gesture.Native();
   const pull = useDirectionLock('vertical')
-    .enabled(custom)
+    .enabled(custom && props.scrollEnabled !== false)
     .simultaneousWithExternalGesture(native)
     .onStart(() => {
       'worklet';

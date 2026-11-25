@@ -63,7 +63,7 @@ export function ExploreFeed({
           style={styles.scroll}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}>
-          <DailyRecs rec={content.rec} />
+          <DailyRecs recs={content.recs} />
           {content.sections.map((section) => (
             <PlaceSection
               key={section.title}

@@ -33,7 +33,8 @@ const ICON_DROP_MS = 180;
 
 type IconSource = ComponentProps<typeof Image>['source'];
 
-// Figma "Explore Top Nav": Explore's Travel / Food / Hang Out switcher. One
+// Figma "Explore Top Nav" (Explore's Travel / Food / Hang Out) and "Plan Nav" (a daily
+// rec's Highlights / Reviews / Guide): a row of tabs. One
 // underline slides between the options; the selected one shows its icon.
 export function CategoryTabs<T extends string>({
   options,

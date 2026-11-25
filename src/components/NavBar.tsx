@@ -13,6 +13,7 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 
+import { useNavBarLock } from '@/components/NavBarLock';
 import { ScalePressable } from '@/components/ScalePressable';
 import { SLIDE } from '@/constants/motion';
 import { colors, fonts, shadows } from '@/constants/theme';
@@ -74,10 +75,11 @@ export const NAV_TABS_CLEARANCE = BOTTOM + NAV_TABS_ONLY;
 // In New Plan with the keyboard up, it floats this far above the keyboard.
 export const KEYBOARD_GAP = 12;
 
-export function NavBar({ state, navigation }: TabBarProps) {
+export function NavBar({ state, emitter, navigateToTab }: TabBarProps) {
   const current = state.routes[state.index].name;
   const hasInput = PAGES_WITH_INPUT.includes(current);
   const { active, close } = useNewPlan();
+  const { onLockedTap } = useNavBarLock();
 
   // The selector's position in tab widths (0 = first tab); how far the input
   // section has risen out of the bar (0 = tabs only, 1 = full); and how far
@@ -136,13 +138,12 @@ export function NavBar({ state, navigation }: TabBarProps) {
             if (!tab) return null;
             const focused = state.index === index;
             const onPress = () => {
-              const event = navigation.emit({
+              const event = emitter.emit({
                 type: 'tabPress',
                 target: route.key,
                 canPreventDefault: true,
               });
-              if (!focused && !event.defaultPrevented)
-                navigation.navigate(route.name, route.params);
+              if (!focused && !event.defaultPrevented) navigateToTab(route.key);
             };
             return (
               <TabButton
@@ -158,6 +159,16 @@ export function NavBar({ state, navigation }: TabBarProps) {
         </View>
       </Animated.View>
       <TripInput shown={inputShown} planMode={planMode} enabled={hasInput} />
+      {/* Locked by the page: the bar's buttons are covered, and a tap on it
+          goes to the page instead (e.g. closing Saved's collection menu). */}
+      {onLockedTap ? (
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          accessibilityRole="button"
+          accessibilityLabel="Close menu"
+          onPress={onLockedTap}
+        />
+      ) : null}
     </View>
   );
 }

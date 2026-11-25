@@ -1,5 +1,7 @@
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { router } from 'expo-router';
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -32,13 +34,13 @@ const SHADOW_ROOM = 24;
 const DOT = 8;
 const DOT_SELECTED_WIDTH = 16;
 
-// Placeholder recs: every card shows the same place for now, on its own colour.
+// Placeholder colours for recs that don't have a photo yet, one per card.
 const CARD_COLORS = ['#0069E2', '#00A5E2', '#00E231', '#E2C000', '#E25E00'];
 
 // Figma "Explore/Home - Example Cards": "Our Daily Recs", a row of cards the
 // user swipes through. The centred card is selected: full size, with
 // a shadow and its details shown; the rest are smaller, flat and bare.
-export function DailyRecs({ rec }: { rec: DailyRec }) {
+export function DailyRecs({ recs }: { recs: DailyRec[] }) {
   const { width } = useWindowDimensions();
   const countdown = useRefreshCountdown();
   // How far the row is swiped along; the cards and dots follow it.
@@ -59,13 +61,19 @@ export function DailyRecs({ rec }: { rec: DailyRec }) {
           // Centres the selected card, the first and last included.
           { paddingHorizontal: (width - CARD_WIDTH) / 2 },
         ]}>
-        {CARD_COLORS.map((color, index) => (
-          <RecCard key={color} index={index} color={color} rec={rec} scrollX={scrollX} />
+        {recs.map((rec, index) => (
+          <RecCard
+            key={index}
+            index={index}
+            color={CARD_COLORS[index % CARD_COLORS.length]}
+            rec={rec}
+            scrollX={scrollX}
+          />
         ))}
       </SwipeRow>
       <View style={styles.dots}>
-        {CARD_COLORS.map((color, index) => (
-          <CardDot key={color} index={index} scrollX={scrollX} />
+        {recs.map((_, index) => (
+          <CardDot key={index} index={index} scrollX={scrollX} />
         ))}
       </View>
     </View>
@@ -133,15 +141,34 @@ function RecCard({
     ),
   }));
 
+  // A card with a photo has no colour behind it, so none shows round its edges
+  // (the shadow layer stays white, the page's colour, to cast its shadow).
+  const background = rec.image ? undefined : color;
+
   return (
     <Animated.View style={[styles.card, cardStyle]}>
-      <Animated.View style={[styles.cardShadow, { backgroundColor: color }, shadowStyle]} />
-      <View style={[styles.cardFace, { backgroundColor: color }]}>
-        {/* Figma's 50% white → 50% dark800 multiply over the card colour. */}
-        <LinearGradient
-          colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.45)']}
-          style={StyleSheet.absoluteFill}
-        />
+      <Animated.View
+        style={[styles.cardShadow, { backgroundColor: background ?? colors.white100 }, shadowStyle]}
+      />
+      {/* A rec with its own page opens it when its card is tapped (Figma
+          "Explore/Home - Daily Recs"); its buttons still do their own thing. */}
+      <Pressable
+        disabled={!rec.page}
+        accessibilityLabel={rec.title}
+        onPress={() => {
+          if (rec.page) router.push({ pathname: '/daily-rec', params: { id: rec.page.id } });
+        }}
+        style={[styles.cardFace, { backgroundColor: background }]}>
+        {rec.image ? (
+          // The photo already has Figma's darkening gradient baked in.
+          <Image source={rec.image} style={StyleSheet.absoluteFill} contentFit="cover" />
+        ) : (
+          // Figma's 50% white → 50% dark800 multiply over the card colour.
+          <LinearGradient
+            colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.45)']}
+            style={StyleSheet.absoluteFill}
+          />
+        )}
         <Animated.View style={[styles.details, detailsStyle]}>
           {/* The title and description span the card's width. */}
           <View>
@@ -158,7 +185,7 @@ function RecCard({
             <SaveButton />
           </View>
         </Animated.View>
-      </View>
+      </Pressable>
     </Animated.View>
   );
 }

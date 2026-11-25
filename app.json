@@ -32,7 +32,8 @@
           "backgroundColor": "#FFFFFF"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "./plugins/withShortNativeBuildPaths"
     ],
     "experiments": {
       "typedRoutes": true,

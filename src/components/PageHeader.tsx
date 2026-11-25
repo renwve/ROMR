@@ -1,6 +1,15 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, fonts } from '@/constants/theme';
@@ -88,18 +97,69 @@ export function SavedHeader() {
   );
 }
 
-// Figma "Saved - New Collection": X to leave without saving, "New Collection",
-// and a check to create it.
-// The check is disabled, in gray300, until `canSave`.
+// Figma "Explore/Home - Daily Recs": back, "Daily Rec" and share (which doesn't
+// do anything yet).
+export function DailyRecHeader() {
+  return (
+    <HeaderRow
+      left={
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+          hitSlop={10}
+          onPress={() => router.back()}>
+          <Image source={require('@/assets/icons/caret-left.svg')} style={styles.icon} />
+        </Pressable>
+      }
+      title="Daily Rec"
+      strongTitle
+      right={
+        <Pressable accessibilityRole="button" accessibilityLabel="Share" hitSlop={10}>
+          <Image source={require('@/assets/icons/upload-simple.svg')} style={styles.icon} />
+        </Pressable>
+      }
+    />
+  );
+}
+
+// The check turning on: a dip to 0.9 in anticipation, a pop to 1.2, then a
+// bouncy settle back to its size.
+const CHECK_DIP = { duration: 90, easing: Easing.out(Easing.quad) };
+const CHECK_POP = { duration: 140, easing: Easing.out(Easing.quad) };
+const CHECK_SETTLE = { dampingRatio: 0.45, duration: 450 };
+
+// Figma "Saved - New Collection" / "Edit Collection": X closes, the check saves.
+// The check is disabled, in gray300, until `canSave`; when it turns on (the
+// user has started a name, or changed the old one) it pops.
 export function NewCollectionHeader({
+  title = 'New Collection',
   onClose,
   onSave,
   canSave,
 }: {
+  title?: string;
   onClose: () => void;
   onSave: () => void;
   canSave: boolean;
 }) {
+  const checkScale = useSharedValue(1);
+  const wasSavable = useRef(canSave);
+
+  useEffect(() => {
+    if (canSave && !wasSavable.current) {
+      checkScale.set(
+        withSequence(
+          withTiming(0.9, CHECK_DIP),
+          withTiming(1.2, CHECK_POP),
+          withSpring(1, CHECK_SETTLE),
+        ),
+      );
+    }
+    wasSavable.current = canSave;
+  }, [canSave, checkScale]);
+
+  const checkStyle = useAnimatedStyle(() => ({ transform: [{ scale: checkScale.get() }] }));
+
   return (
     <HeaderRow
       left={
@@ -111,7 +171,7 @@ export function NewCollectionHeader({
           <Image source={require('@/assets/icons/x-navy.svg')} style={styles.icon} />
         </Pressable>
       }
-      title="New Collection"
+      title={title}
       strongTitle
       right={
         <Pressable
@@ -121,14 +181,16 @@ export function NewCollectionHeader({
           disabled={!canSave}
           hitSlop={10}
           onPress={onSave}>
-          <Image
-            source={
-              canSave
-                ? require('@/assets/icons/check.svg')
-                : require('@/assets/icons/check-gray.svg')
-            }
-            style={styles.icon}
-          />
+          <Animated.View style={checkStyle}>
+            <Image
+              source={
+                canSave
+                  ? require('@/assets/icons/check.svg')
+                  : require('@/assets/icons/check-gray.svg')
+              }
+              style={styles.icon}
+            />
+          </Animated.View>
         </Pressable>
       }
     />

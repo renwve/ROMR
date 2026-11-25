@@ -1,5 +1,13 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
-import { BackHandler, type TextInput } from 'react-native';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from 'react';
+import { BackHandler, type TextInputInstance } from 'react-native';
 
 export type ChatMessage = {
   id: string;
@@ -27,7 +35,7 @@ type NewPlanContextValue = {
   start: () => void;
   send: (text: string) => void;
   close: () => void;
-  inputRef: RefObject<TextInput | null>;
+  inputRef: RefObject<TextInputInstance | null>;
 };
 
 const NewPlanContext = createContext<NewPlanContextValue | null>(null);
@@ -42,7 +50,7 @@ export function NewPlanProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
   const replyTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const nextId = useRef(0);
 
@@ -59,7 +67,10 @@ export function NewPlanProvider({ children }: { children: ReactNode }) {
     });
     setMessages((prev) => [...prev, message('user', trimmed, timeLabel(new Date()))]);
     replyTimers.current.push(
-      setTimeout(() => setMessages((prev) => [...prev, message('assistant', ASSISTANT_REPLY)]), REPLY_DELAY_MS),
+      setTimeout(
+        () => setMessages((prev) => [...prev, message('assistant', ASSISTANT_REPLY)]),
+        REPLY_DELAY_MS,
+      ),
     );
   };
 

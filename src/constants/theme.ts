@@ -10,6 +10,7 @@ export const colors = {
   gray200: '#B7B8CD',
   gray300: '#989BB8',
   gray400: '#7A7EA3',
+  gray500: '#60648B',
   gray700: '#36394E',
   dark800: '#18191B',
 } as const;

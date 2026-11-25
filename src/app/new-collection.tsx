@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -18,10 +18,18 @@ const SAVES = ['1', '2', '3', '4', '5', '6'].map((id) => ({ id, title: 'Title' }
 // Figma "Saved - New Collection" (and "- Keyboard Up" while naming it): name a
 // new collection and tick the saves to put in it. The check creates it and
 // goes back to Saved; X leaves without creating anything.
+//
+// Opened with a collection's `id` (its menu's "Edit Collection"), it renames that
+// collection instead: Figma "Saved - New Collection - Previous Name" / "- New
+// Name". The field starts with the current name, and the check only turns on
+// once the name is different.
 export default function NewCollectionScreen() {
-  const { addCollection } = useCollections();
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { collections, addCollection, renameCollection } = useCollections();
+  // The collection being renamed, if this is Edit Collection.
+  const editing = collections.find((collection) => collection.id === id);
   const insets = useSafeAreaInsets();
-  const [name, setName] = useState('');
+  const [name, setName] = useState(editing?.name ?? '');
   const [nameFocused, setNameFocused] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
 
@@ -31,11 +39,13 @@ export default function NewCollectionScreen() {
     );
 
   // Leading spaces are dropped as they're typed, so spaces alone leave it empty.
-  const canSave = name.trim().length > 0;
+  const trimmed = name.trim();
+  const canSave = trimmed.length > 0 && trimmed !== editing?.name;
 
-  const create = () => {
+  const save = () => {
     if (!canSave) return;
-    addCollection(name.trim(), picked);
+    if (editing) renameCollection(editing.id, trimmed);
+    else addCollection(trimmed, picked);
     router.back();
   };
 
@@ -51,14 +61,21 @@ export default function NewCollectionScreen() {
       <StatusBar style="dark" />
       <DismissKeyboard>
         <StatusBarSpace />
-        <NewCollectionHeader onClose={() => router.back()} onSave={create} canSave={canSave} />
+        <NewCollectionHeader
+          title={editing ? 'Edit Collection' : 'New Collection'}
+          onClose={() => router.back()}
+          onSave={save}
+          canSave={canSave}
+        />
         <ScrollView
           style={styles.page}
           contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           <View style={styles.nameSection}>
-            <Text style={styles.heading}>Collection Name</Text>
+            <Text style={styles.heading}>
+              {editing ? 'New Collection Name' : 'Collection Name'}
+            </Text>
             {/* Outlined in blue300 while typing ("- Keyboard Up"). */}
             <View style={[styles.nameField, nameFocused && styles.nameFieldFocused]}>
               <TextInput
@@ -74,38 +91,41 @@ export default function NewCollectionScreen() {
               />
             </View>
           </View>
-          <View style={styles.fillSection}>
-            <Text style={styles.heading}>Fill your new collection</Text>
-            {rows.map((row) => (
-              <View key={row[0].id} style={styles.row}>
-                {row.map((save) => {
-                  const isPicked = picked.includes(save.id);
-                  return (
-                    <ScalePressable
-                      key={save.id}
-                      accessibilityRole="checkbox"
-                      accessibilityState={{ checked: isPicked }}
-                      accessibilityLabel={save.title}
-                      onPress={() => toggle(save.id)}
-                      style={styles.tileTarget}
-                      contentStyle={styles.tileContent}>
-                      <View style={[styles.tile, isPicked && styles.tilePicked]}>
-                        <Image
-                          source={
-                            isPicked
-                              ? require('@/assets/icons/check-circle.svg')
-                              : require('@/assets/icons/circle-empty.svg')
-                          }
-                          style={styles.tick}
-                        />
-                      </View>
-                      <Text style={styles.tileTitle}>{save.title}</Text>
-                    </ScalePressable>
-                  );
-                })}
-              </View>
-            ))}
-          </View>
+          {/* Edit Collection only renames. */}
+          {editing ? null : (
+            <View style={styles.fillSection}>
+              <Text style={styles.heading}>Fill your new collection</Text>
+              {rows.map((row) => (
+                <View key={row[0].id} style={styles.row}>
+                  {row.map((save) => {
+                    const isPicked = picked.includes(save.id);
+                    return (
+                      <ScalePressable
+                        key={save.id}
+                        accessibilityRole="checkbox"
+                        accessibilityState={{ checked: isPicked }}
+                        accessibilityLabel={save.title}
+                        onPress={() => toggle(save.id)}
+                        style={styles.tileTarget}
+                        contentStyle={styles.tileContent}>
+                        <View style={[styles.tile, isPicked && styles.tilePicked]}>
+                          <Image
+                            source={
+                              isPicked
+                                ? require('@/assets/icons/check-circle.svg')
+                                : require('@/assets/icons/circle-empty.svg')
+                            }
+                            style={styles.tick}
+                          />
+                        </View>
+                        <Text style={styles.tileTitle}>{save.title}</Text>
+                      </ScalePressable>
+                    );
+                  })}
+                </View>
+              ))}
+            </View>
+          )}
         </ScrollView>
       </DismissKeyboard>
     </View>

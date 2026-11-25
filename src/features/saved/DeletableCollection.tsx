@@ -1,4 +1,5 @@
 import * as Haptics from 'expo-haptics';
+import type { ComponentProps } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -61,10 +62,18 @@ export function DeletableCollection({
   name,
   count,
   onDelete,
+  onHold,
+  held,
+  locked,
 }: {
   name: string;
   count: string;
   onDelete: () => void;
+  // Passed on to the card: holding it opens its menu.
+  onHold: ComponentProps<typeof CollectionCard>['onHold'];
+  held: boolean;
+  // While a collection menu is open, it can't be swiped or held.
+  locked: boolean;
 }) {
   const reveal = useSharedValue(0);
   const start = useSharedValue(0);
@@ -72,6 +81,7 @@ export function DeletableCollection({
   const stretched = useSharedValue(false);
 
   const swipe = useDirectionLock('horizontal')
+    .enabled(!locked)
     .onStart(() => {
       'worklet';
       cancelAnimation(reveal);
@@ -135,7 +145,7 @@ export function DeletableCollection({
           if (event.nativeEvent.actionName === 'delete') onDelete();
         }}>
         <Animated.View style={cardStyle}>
-          <CollectionCard name={name} count={count} />
+          <CollectionCard name={name} count={count} onHold={onHold} held={held} locked={locked} />
         </Animated.View>
         <View style={styles.buttonSlot} pointerEvents="none">
           <AnimatedSquircle style={[styles.button, buttonStyle]}>
