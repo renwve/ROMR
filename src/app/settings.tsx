@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Pressable,
@@ -60,6 +61,41 @@ function SettingsRow({
 
 export default function SettingsScreen() {
   const [anonymous, setAnonymous] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  // Load saved anonymous sharing preference
+  useEffect(() => {
+    const loadAnonymous = async () => {
+      try {
+        const saved = await AsyncStorage.getItem("anonymousSharing");
+
+        if (saved !== null) {
+          setAnonymous(saved === "true");
+        }
+
+        setLoaded(true);
+      } catch (error) {
+        console.error("Error loading anonymous preference:", error);
+      }
+    };
+
+    loadAnonymous();
+  }, []);
+
+  // Save anonymous sharing preference
+  useEffect(() => {
+    if (!loaded) return;
+
+    const saveAnonymous = async () => {
+      try {
+        await AsyncStorage.setItem("anonymousSharing", String(anonymous));
+      } catch (error) {
+        console.error("Error saving anonymous preference:", error);
+      }
+    };
+
+    saveAnonymous();
+  }, [anonymous, loaded]);
 
   const notConnected = (feature: string) => {
     Alert.alert(
@@ -81,31 +117,6 @@ export default function SettingsScreen() {
         },
       ],
     );
-  };
-
-  const confirmDelete = () => {
-    Alert.alert(
-      "Delete Account?",
-      "Account deletion is permanent. This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Continue",
-          style: "destructive",
-          onPress: () => notConnected("Delete Account"),
-        },
-      ],
-    );
-  };
-
-  const confirmSignOut = () => {
-    Alert.alert("Sign Out?", "Are you sure you want to sign out?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Sign Out",
-        onPress: () => notConnected("Sign Out"),
-      },
-    ]);
   };
 
   return (
@@ -138,12 +149,6 @@ export default function SettingsScreen() {
             onPress={() => notConnected("Personal Information ")}
           />
           <View style={styles.divider} />
-          <SettingsRow
-            icon="lock-closed-outline"
-            title="Password & Security"
-            subtitle="Manage your password and account security"
-            onPress={() => notConnected("Password & Security")}
-          />
         </View>
 
         <Text style={styles.sectionTitle}>NOTIFICATIONS</Text>
@@ -153,7 +158,7 @@ export default function SettingsScreen() {
             icon="notifications-outline"
             title="Notification Preferences"
             subtitle="Manage your travel alerts and updates"
-            onPress={() => notConnected("Notification Preferences")}
+            onPress={() => router.push("/settings-notifications")}
           />
         </View>
 
@@ -172,6 +177,7 @@ export default function SettingsScreen() {
             <Switch
               value={anonymous}
               onValueChange={setAnonymous}
+              disabled={!loaded}
               trackColor={{ false: "#D5D8E0", true: "#AFC5F5" }}
               thumbColor={anonymous ? COLORS.navy : COLORS.white}
             />
@@ -185,7 +191,7 @@ export default function SettingsScreen() {
             icon="help-circle-outline"
             title="Help & Support"
             subtitle="Get help using ROMR"
-            onPress={() => notConnected("Help & Support")}
+            onPress={() => router.push("/settings-help")}
           />
 
           <View style={styles.divider} />
@@ -194,16 +200,16 @@ export default function SettingsScreen() {
             icon="chatbubble-outline"
             title="Send Feedback"
             subtitle="Help us improve your experience"
-            onPress={() => notConnected("Send Feedback")}
+            onPress={() => router.push("/settings-feedback")}
           />
 
           <View style={styles.divider} />
 
           <SettingsRow
             icon="shield-checkmark-outline"
-            title="Privacy Policy"
-            subtitle="Learn how we handle your data"
-            onPress={() => notConnected("Privacy Policy")}
+            title="Privacy & Data"
+            subtitle="Learn about your privacy and preferences"
+            onPress={() => router.push("/settings-privacy")}
           />
         </View>
 
@@ -215,20 +221,7 @@ export default function SettingsScreen() {
             subtitle="Clear saved destinations and preferences"
             onPress={confirmReset}
           />
-          <View style={styles.divider} />
-          <SettingsRow
-            icon="trash-outline"
-            title="Delete Account"
-            subtitle="Permanently delete your ROMR account"
-            onPress={confirmDelete}
-            danger
-          />
         </View>
-
-        <Pressable style={styles.signOut} onPress={confirmSignOut}>
-          <Ionicons name="log-out-outline" size={22} color={COLORS.red} />
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </Pressable>
 
         <Text style={styles.version}>ROMR • Version 1.0</Text>
       </ScrollView>
@@ -334,23 +327,6 @@ const styles = StyleSheet.create({
     marginLeft: 65,
   },
 
-  signOut: {
-    marginTop: 28,
-    backgroundColor: COLORS.white,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 17,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-  },
-  signOutText: {
-    fontFamily: "BeVietnamProSemiBold",
-    fontSize: 14,
-    color: COLORS.red,
-  },
   version: {
     textAlign: "center",
     fontFamily: "BeVietnamProRegular",
