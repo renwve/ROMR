@@ -33,6 +33,12 @@
           "imageWidth": 76
         }
       ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow ROMR to use your location to find nearby places and experiences."
+        }
+      ],
       "expo-font"
     ],
     "experiments": {
