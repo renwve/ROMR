@@ -18,13 +18,15 @@ import { SaveButton } from '@/components/SaveButton';
 import { WhiteButton } from '@/components/WhiteButton';
 import { colors, fonts } from '@/constants/theme';
 import { findRecByPageId } from '@/features/explore/content';
+import { Highlights } from '@/features/explore/Highlights';
+import { Reviews } from '@/features/explore/Reviews';
 import { Roverview } from '@/features/explore/Roverview';
 
 // The floating Start Planning / save row: 24pt off the bottom, 11pt in from the
-// sides (380 wide on Figma's 402pt screen).
+// sides (380 wide on Figma's 402pt screen), its buttons 56pt tall.
 const BAR_BOTTOM = 24;
 const BAR_SIDE = 11;
-const BAR_HEIGHT = 44;
+const BAR_HEIGHT = 56;
 // Figma component set "Plan Nav": the rec's tabs, which behave like Explore's
 // top nav (the underline slides, the selected tab's icon pops up).
 const PLAN_TABS = ['Highlights', 'Reviews', 'Guide'] as const;
@@ -92,12 +94,11 @@ export default function DailyRecScreen() {
     <View style={styles.page}>
       <StatusBar style="dark" />
       <StatusBarSpace />
-      <DailyRecHeader />
+      <DailyRecHeader place={rec.title} showPlace={pinned} />
       <View style={styles.page}>
         <Animated.ScrollView
           onScroll={onScroll}
           onLayout={(event) => setViewHeight(event.nativeEvent.layout.height)}
-          contentContainerStyle={{ paddingBottom: barBottom + BAR_HEIGHT + 24 }}
           showsVerticalScrollIndicator={false}>
           <View style={styles.hero}>
             <Image source={rec.page.hero} style={StyleSheet.absoluteFill} contentFit="cover" />
@@ -122,9 +123,25 @@ export default function DailyRecScreen() {
               icons={PLAN_TAB_ICONS}
             />
           </View>
-          {/* The selected tab's content (none yet). At least a screen tall, so
-            Plan Nav can always be scrolled up to the header. */}
-          <View style={{ minHeight: viewHeight - PLAN_NAV_HEIGHT }} />
+          {/* The selected tab's content (Highlights or Reviews so far), at least
+            the screen under Plan Nav so Plan Nav can always reach the header.
+            Highlights fills it exactly, so the page stops there, leaving its
+            cards 40pt under Plan Nav. Reviews is longer and scrolls on, with room
+            at the end for the last review to clear the Start Planning bar. */}
+          <View
+            style={
+              tab === 'Highlights'
+                ? { height: viewHeight - PLAN_NAV_HEIGHT }
+                : {
+                    minHeight: viewHeight - PLAN_NAV_HEIGHT,
+                    paddingBottom: barBottom + BAR_HEIGHT,
+                  }
+            }>
+            {tab === 'Highlights' && rec.page.highlights ? (
+              <Highlights highlights={rec.page.highlights} />
+            ) : null}
+            {tab === 'Reviews' && rec.page.reviews ? <Reviews reviews={rec.page.reviews} /> : null}
+          </View>
         </Animated.ScrollView>
         {/* Plan Nav sticks under the header once it's scrolled up to it. This
             copy is pinned there and shown in its place, rather than using the
@@ -143,8 +160,9 @@ export default function DailyRecScreen() {
           icon={require('@/assets/icons/star-four.svg')}
           label="Start Planning"
           style={styles.planButton}
+          contentStyle={styles.barButton}
         />
-        <SaveButton shadow="mediumSoft" />
+        <SaveButton saveId={rec.page.id} shadow="mediumSoft" size={BAR_HEIGHT} />
       </View>
     </View>
   );
@@ -223,5 +241,9 @@ const styles = StyleSheet.create({
   },
   planButton: {
     flex: 1,
+  },
+  barButton: {
+    height: BAR_HEIGHT,
+    paddingVertical: 0,
   },
 });

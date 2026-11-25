@@ -14,6 +14,8 @@ type CollectionsValue = {
   addCollection: (name: string, saveIds: string[]) => void;
   removeCollection: (id: string) => void;
   renameCollection: (id: string, name: string) => void;
+  // Puts a save in the collection, or takes it out if it's already there.
+  toggleInCollection: (id: string, saveId: string) => void;
 };
 
 const CollectionsContext = createContext<CollectionsValue | null>(null);
@@ -40,9 +42,30 @@ export function CollectionsProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const toggleInCollection = (id: string, saveId: string) => {
+    setCollections((current) =>
+      current.map((collection) =>
+        collection.id !== id
+          ? collection
+          : {
+              ...collection,
+              saveIds: collection.saveIds.includes(saveId)
+                ? collection.saveIds.filter((savedId) => savedId !== saveId)
+                : [saveId, ...collection.saveIds],
+            },
+      ),
+    );
+  };
+
   return (
     <CollectionsContext.Provider
-      value={{ collections, addCollection, removeCollection, renameCollection }}>
+      value={{
+        collections,
+        addCollection,
+        removeCollection,
+        renameCollection,
+        toggleInCollection,
+      }}>
       {children}
     </CollectionsContext.Provider>
   );

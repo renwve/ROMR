@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -49,12 +50,16 @@ function popUpAndHold() {
 // from behind the nav bar to sit ABOVE_NAV above it, wherever the bar's top is
 // (its height changes with the page; `navHeight` follows it), stays up for
 // HOLD_MS and then tucks away again. Saving another plan while it's up pops it
-// afresh. It can be swiped down to dismiss it sooner. "Edit" does nothing yet.
+// afresh. It can be swiped down to dismiss it sooner. Tapping it opens Saved;
+// tapping "Edit" opens Figma "Choose Collection" for the plan just saved.
+// Either way it tucks away.
 // The nav bar draws it behind itself.
 export function PlanSavedToast({ navHeight }: { navHeight: SharedValue<number> }) {
-  const { planSavedKey } = useToast();
+  const { planSavedKey, openChooseCollection } = useToast();
   // How far below its resting spot it is: 0 = up, HIDDEN = tucked away.
   const drop = useSharedValue(HIDDEN);
+  // Where "Edit" starts across the toast; taps from there on are its own.
+  const editLeft = useSharedValue(WIDTH);
 
   useEffect(() => {
     if (planSavedKey === 0) return;
@@ -80,6 +85,15 @@ export function PlanSavedToast({ navHeight }: { navHeight: SharedValue<number> }
       drop.set(dismiss ? withTiming(HIDDEN, SLIDE) : popUpAndHold());
     });
 
+  const tap = Gesture.Tap()
+    .runOnJS(true)
+    .onEnd((event, success) => {
+      if (!success) return;
+      drop.set(withTiming(HIDDEN, SLIDE));
+      if (event.x >= editLeft.get()) openChooseCollection();
+      else router.navigate('/saved');
+    });
+
   const style = useAnimatedStyle(() => ({
     bottom: navHeight.get() + ABOVE_NAV,
     opacity: interpolate(drop.get(), [HIDDEN - FADE, HIDDEN], [1, 0], Extrapolation.CLAMP),
@@ -87,13 +101,15 @@ export function PlanSavedToast({ navHeight }: { navHeight: SharedValue<number> }
   }));
 
   return (
-    <GestureDetector gesture={swipe}>
+    <GestureDetector gesture={Gesture.Race(swipe, tap)}>
       <Animated.View style={[styles.toast, style]}>
         <View style={styles.message}>
           <Image source={require('@/assets/icons/heart-saved.svg')} style={styles.heart} />
           <Text style={styles.text}>Plan Saved to Collection</Text>
         </View>
-        <Text style={styles.text}>Edit</Text>
+        <Text style={styles.text} onLayout={(event) => editLeft.set(event.nativeEvent.layout.x)}>
+          Edit
+        </Text>
       </Animated.View>
     </GestureDetector>
   );

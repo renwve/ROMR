@@ -9,6 +9,7 @@ import { SplashPage } from '@/components/SplashPage';
 import { colors } from '@/constants/theme';
 import { OnboardingProvider, useOnboarding } from '@/features/onboarding/OnboardingContext';
 import { CollectionsProvider } from '@/features/saved/CollectionsContext';
+import { SavesProvider } from '@/features/saved/SavesContext';
 import { ToastProvider } from '@/features/toast/ToastContext';
 
 // Keep the native launch screen up until fonts load, then hand over to SplashPage,
@@ -45,9 +46,11 @@ export default function RootLayout() {
           the Plan Saved toast by every page with a heart (the tabs, Daily Rec). */}
       <OnboardingProvider>
         <CollectionsProvider>
-          <ToastProvider>
-            <RootStack />
-          </ToastProvider>
+          <SavesProvider>
+            <ToastProvider>
+              <RootStack />
+            </ToastProvider>
+          </SavesProvider>
         </CollectionsProvider>
       </OnboardingProvider>
       {showSplash ? <SplashPage onFinish={hideSplash} /> : null}
@@ -71,6 +74,7 @@ function RootStack() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="new-collection" />
         <Stack.Screen name="daily-rec" />
+        <Stack.Screen name="collection" />
       </Stack.Protected>
     </Stack>
   );

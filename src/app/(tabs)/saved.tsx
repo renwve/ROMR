@@ -13,11 +13,10 @@ import { CollectionCard } from '@/features/saved/CollectionCard';
 import { CollectionMenu } from '@/features/saved/CollectionMenu';
 import { useCollections } from '@/features/saved/CollectionsContext';
 import { DeletableCollection } from '@/features/saved/DeletableCollection';
+import { EVERYTHING_ID, useSaves } from '@/features/saved/SavesContext';
 
-// Every collection shows this count until there's a backend to count saves.
+// The user's own collections show this count until they hold real saves.
 const PLACEHOLDER_COUNT = '+99';
-// The Everything Collection's id, alongside the user's own collections'.
-const EVERYTHING_ID = 'everything';
 
 // A deleted collection fades away while the ones below slide up into its place.
 const LEAVE = FadeOut.duration(200);
@@ -30,6 +29,7 @@ const CLOSE_UP = LinearTransition.duration(SLIDE.duration);
 // (Figma "Saved - Edit Collection").
 export default function SavedScreen() {
   const { collections, removeCollection } = useCollections();
+  const { savedIds } = useSaves();
   // The collection whose menu is showing, where the menu opens, and whether it's
   // open or on its way out (it stays until it has shrunk away).
   const [menu, setMenu] = useState<{
@@ -64,8 +64,13 @@ export default function SavedScreen() {
         <View style={styles.collections}>
           <CollectionCard
             name="The Everything Collection"
-            count={PLACEHOLDER_COUNT}
+            // How many Daily Recs the user has hearted.
+            count={String(savedIds.length)}
             everything
+            // Opens Figma "Saved - Open Collection" (not while a menu is open).
+            onPress={() => {
+              if (!menu) router.push({ pathname: '/collection', params: { id: EVERYTHING_ID } });
+            }}
             onHold={openMenu(EVERYTHING_ID)}
             held={isHeld(EVERYTHING_ID)}
             locked={!!menu}

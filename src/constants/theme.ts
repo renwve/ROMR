@@ -14,6 +14,7 @@ export const colors = {
   gray700: '#36394E',
   dark800: '#18191B',
   red600: '#E92E31',
+  echoGreen: '#C3FF00',
 } as const;
 
 // Keys registered with useFonts in src/app/_layout.tsx.
